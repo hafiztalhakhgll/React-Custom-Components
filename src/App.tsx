@@ -1,5 +1,5 @@
 import { Container, Box } from "@mui/material";
-import Table from "./components/table";
+import User from "./screens/User";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
           height: "100vh"
         }}
       >
-        <Table />
+        <User />
       </Box>
     </Container>
   );
