@@ -1,5 +1,5 @@
 import { Container, Box } from "@mui/material";
-import User from "./screens/User";
+import Feedback from "./screens/Feedback";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
           height: "100vh"
         }}
       >
-        <User />
+        <Feedback />
       </Box>
     </Container>
   );
