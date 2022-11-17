@@ -14,6 +14,10 @@ const Heading: FC<IHeading> = ({ column }) => {
     return <th>{column}</th>;
   }
 
+  if (column["label"] || column["label"] === "") {
+    return <th>{column["label"]}</th>;
+  }
+
   return <th>{column["key"]}</th>;
 };
 
@@ -21,8 +25,8 @@ const TableHead: FC<ITableHead> = ({ columns }) => {
   return (
     <thead>
       <tr>
-        {columns.map((column: IColumn) => (
-          <Heading column={column} />
+        {columns.map((column: IColumn, index) => (
+          <Heading key={index + 1} column={column} />
         ))}
       </tr>
     </thead>
