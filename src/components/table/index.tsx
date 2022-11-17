@@ -32,80 +32,45 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   // }
 }));
 
-// function pagination(){
-//   function paginate(array: any, page_size: number, page_number: number) {
-//     // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
-//     return array.slice((page_number - 1) * page_size, page_number * page_size);
-//   }
-//   var arr = [1, 2, 3, 4, 5, 6];
+interface IField {
+  key: string;
+  label: string;
+}
+interface IData {
+  id: string;
+  name: string;
+  email: string;
+  contact: string;
+  address: string;
+  action: string;
+}
 
-//   const options = {
-//     //page: parseInt(req.query.page) || 1,
-//     page: 1,
-//     limit: 10
-//     //limit: parseInt(req.query.limit) || 10,
-//     //customLabels: servCustomLabels,
-//   };
-
-//   let prev_page = 0;
-//   let next_page = 0;
-//   let h_p_p = null;
-//   let h_n_p = null;
-//   let page_count = Math.ceil(arr.length / options.limit);
-
-//   if (options.page >= page_count) {
-//     // 2 3
-//     next_page = 0;
-//   }
-//   if (options.page >= 1 && options.page < page_count) {
-//     next_page = options.page + 1;
-//     h_n_p = true;
-//   } else {
-//     next_page = 0;
-//     h_n_p = false;
-//   }
-
-//   if (options.page <= 1) {
-//     prev_page = 0;
-//     h_p_p = false;
-//   } else {
-//     prev_page = options.page - 1;
-//     h_p_p = true;
-//   }
-
-//   console.log(paginate(arr, 2, 2));
-//   console.log({
-//     paginator: {
-//       totalDocs: arr.length,
-//       perPage: options.limit,
-//       pageCount: page_count,
-//       currentPage: options.page,
-//       //slNo: 2,
-//       hasPrevPage: h_p_p,
-//       hasNextPage: h_n_p,
-//       prev: prev_page,
-//       next: next_page
-//     }
-//   });
-// }
+interface ITableScopedSlots {
+  action: () => React.ReactElement;
+}
 
 interface TableProps {
-  data: {
-    id: string;
-    name: string;
-    calories: number;
-    fat: number;
-    carbs: number;
-    protein: number;
-  }[];
+  headings: Array<string>;
+  fields: Array<IField>;
+  data: Array<IData>;
   page: number;
   setPage: (x: number) => void;
   perPage: number;
   setPerPage: (x: number) => void;
+  scopedSlots: ITableScopedSlots;
 }
 
 // function Table({ data, page, setPage, perPage, setPerPage }: TableProps) {
-const Table: FC<TableProps> = ({ data, page, setPage, perPage, setPerPage }) => {
+const Table: FC<TableProps> = ({
+  headings,
+  fields,
+  data,
+  page,
+  setPage,
+  perPage,
+  setPerPage,
+  scopedSlots
+}) => {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -118,34 +83,47 @@ const Table: FC<TableProps> = ({ data, page, setPage, perPage, setPerPage }) => 
   return (
     <Paper>
       <TableContainer>
-        <MuiTable>
+        <MuiTable sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-              <StyledTableCell>Calories</StyledTableCell>
-              <StyledTableCell>Fat&nbsp;(g)</StyledTableCell>
-              <StyledTableCell>Carbs&nbsp;(g)</StyledTableCell>
-              <StyledTableCell>Protein&nbsp;(g)</StyledTableCell>
+              {fields.map((value) => (
+                <StyledTableCell key={value.key}>{value.label}</StyledTableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell component="th" scope="row">
-                  {row.name}
-                </StyledTableCell>
-                <StyledTableCell>{row.calories}</StyledTableCell>
-                <StyledTableCell>{row.fat}</StyledTableCell>
-                <StyledTableCell>{row.carbs}</StyledTableCell>
-                <StyledTableCell>{row.protein}</StyledTableCell>
-              </StyledTableRow>
-            ))}
+            {data.map((value: IData, index) => {
+              console.log(value);
+              return (
+                <StyledTableRow key={index}>
+                  {fields.map((field: IField, index) => {
+                    const _field = field.key as keyof IData;
+                    if (scopedSlots[_field]) {
+                      const myComponent = scopedSlots[_field];
+                      return (
+                        <StyledTableCell key={index}>{myComponent(value, index)}</StyledTableCell>
+                      );
+                    } else return <StyledTableCell key={index}>{value[_field]}</StyledTableCell>;
+                  })}
+                </StyledTableRow>
+              );
+            })}
+            <StyledTableRow>
+              <StyledTableCell>{"1"}</StyledTableCell>
+              <StyledTableCell>{"Talha Khalid"}</StyledTableCell>
+              <StyledTableCell>{"talha.khalid@greenlightlabs.tech"}</StyledTableCell>
+              <StyledTableCell>{"03040438807"}</StyledTableCell>
+              <StyledTableCell>
+                {"House no. LS-5, Sector W2, Gulshan-e-Maymar, Karachi"}
+              </StyledTableCell>
+            </StyledTableRow>
           </TableBody>
         </MuiTable>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 20, 30]}
         component="div"
+        labelRowsPerPage=""
         count={data.length}
         rowsPerPage={perPage}
         page={page}
